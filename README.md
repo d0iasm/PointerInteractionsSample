@@ -1,3 +1,5 @@
+This is a project from https://developer.apple.com/documentation/uikit/pointer_interactions/integrating_pointer_interactions_into_your_ipad_app with a little modifications.
+
 # Integrating Pointer Interactions into Your iPad App
 
 Support touch interactions in your iPad app by adding pointer interactions to your views.
