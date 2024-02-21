@@ -1,19 +1,19 @@
 /*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-Primary view controller for the sample code project.
-*/
+ See LICENSE folder for this sample’s licensing information.
+ 
+ Abstract:
+ Primary view controller for the sample code project.
+ */
 
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     @IBOutlet var ovalShape: OvalShapeView!
     @IBOutlet var roundRectShape: RoundrectShapeView!
     @IBOutlet var squareShape: ShapeView!
     @IBOutlet var triangleShape: TriangleShapeView!
-
+    
     @IBOutlet var alphaControl: AlphaControl!
     
     override func viewDidLoad() {
@@ -23,6 +23,9 @@ class ViewController: UIViewController {
         
         // Set the alpha control's color, and add a pointer interaction.
         alphaControl.currentColor = UIColor.systemOrange
+        if #available(iOS 17.0, *) {
+            alphaControl.hoverStyle = .init(shape: .capsule)
+        }
         alphaControl.addInteraction(UIPointerInteraction(delegate: self))
         
         setupShapeView(shapeView: ovalShape, color: UIColor.systemRed, label: "Lift")
@@ -33,14 +36,17 @@ class ViewController: UIViewController {
     
     func setupButtons() {
         /** Turn on and provide pointer style providers for the four UIButtons in this view controller.
-            For convenience reference the buttons by their view tag.
-        */
+         For convenience reference the buttons by their view tag.
+         */
         for tag in 1...5 {
             if let button = view.viewWithTag(tag) as? UIButton {
                 /** Set the pointerStyleProvider on this button.
-                    Note: When setting a provider, setting "isPointerInteractionEnabled" to true for this button is not necessary).
-                */
+                 Note: When setting a provider, setting "isPointerInteractionEnabled" to true for this button is not necessary).
+                 */
                 button.pointerStyleProvider = buttonProvider
+                if #available(iOS 17.0, *) {
+                    button.hoverStyle = .init(shape: .capsule)
+                }
             }
         }
     }
@@ -52,35 +58,39 @@ class ViewController: UIViewController {
         
         // Make the shape view movable.
         let panGestureRecognizer =
-            UIPanGestureRecognizer(target: self, action: #selector(panShape(_:)))
+        UIPanGestureRecognizer(target: self, action: #selector(panShape(_:)))
         panGestureRecognizer.delegate = self
         shapeView.addGestureRecognizer(panGestureRecognizer)
-
+        
         // Make this shape view tappable.
         // Note here we use a custom tap gesture recognizer for showing how to block a tap event.
         let tapGestureRecognizer =
-            UITapGestureRecognizer(target: self, action: #selector(tapShape(_:)))
+        UITapGestureRecognizer(target: self, action: #selector(tapShape(_:)))
         tapGestureRecognizer.delegate = self // As the delegate we want to gate any particular event.
         shapeView.addGestureRecognizer(tapGestureRecognizer)
-
+        
         // Make this shape grow and shrink with pinch.
         let pinchGestureRecognizer =
-            UIPinchGestureRecognizer(target: self, action: #selector(scaleShape(_:)))
+        UIPinchGestureRecognizer(target: self, action: #selector(scaleShape(_:)))
         shapeView.addGestureRecognizer(pinchGestureRecognizer)
         
         // Make this shape change when hovered over.
         let hoverGestureRecognizer =
-            UIHoverGestureRecognizer(target: self, action: #selector(hoverShape(_:)))
+        UIHoverGestureRecognizer(target: self, action: #selector(hoverShape(_:)))
         shapeView.addGestureRecognizer(hoverGestureRecognizer)
-
+        
         // Set up pointer interaction on this view coordinated by this view controller.
         shapeView.addInteraction(UIPointerInteraction(delegate: self))
         
         /** Add a contextual menu to this shape.
-            Contextual menu is opened by touchscreen touch and hold, trackpad two-finger button click, and control-click.
+         Contextual menu is opened by touchscreen touch and hold, trackpad two-finger button click, and control-click.
          */
         let contextMenuInteraction = UIContextMenuInteraction(delegate: self)
         shapeView.addInteraction(contextMenuInteraction)
+        
+        if #available(iOS 17.0, *) {
+            shapeView.hoverStyle = .init(shape: .capsule)
+        }
     }
     
     // MARK: - UIGestureRecognizer
@@ -91,8 +101,8 @@ class ViewController: UIViewController {
                 let locationInView = gestureRecognizer.location(in: shapeViewToUse)
                 let locationInSuperview = gestureRecognizer.location(in: shapeViewToUse.superview)
                 shapeViewToUse.layer.anchorPoint =
-                    CGPoint(x: locationInView.x / shapeViewToUse.bounds.size.width,
-                            y: locationInView.y / shapeViewToUse.bounds.size.height)
+                CGPoint(x: locationInView.x / shapeViewToUse.bounds.size.width,
+                        y: locationInView.y / shapeViewToUse.bounds.size.height)
                 shapeViewToUse.center = locationInSuperview
             }
         }
@@ -101,36 +111,36 @@ class ViewController: UIViewController {
     @objc
     func panShape(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard let shapeViewToUse = gestureRecognizer.view as? ShapeView else { return }
-
+        
         func updateShapeView() {
             let translation = gestureRecognizer.translation(in: shapeViewToUse.superview)
-
+            
             if gestureRecognizer.modifierFlags.contains(.command) {
                 // Command key is down during pan, change the frame to orange.
                 shapeViewToUse.viewPathColor = UIColor.systemOrange
                 shapeViewToUse.setNeedsDisplay()
             }
-
+            
             shapeViewToUse.center =
-                CGPoint(x: shapeViewToUse.center.x + translation.x,
-                        y: shapeViewToUse.center.y + translation.y)
-
+            CGPoint(x: shapeViewToUse.center.x + translation.x,
+                    y: shapeViewToUse.center.y + translation.y)
+            
             gestureRecognizer.setTranslation(CGPoint(), in: shapeViewToUse.superview)
         }
-
+        
         switch gestureRecognizer.state {
         case .began:
             adjustAnchorPointForGestureRecognizer(gestureRecognizer: gestureRecognizer)
             updateShapeView()
-
+            
         case .changed:
             updateShapeView()
-
+            
         case .ended, .cancelled:
             // Reset the frame to yellow in case the user held down the command key.
             shapeViewToUse.viewPathColor = UIColor.systemYellow
             shapeViewToUse.setNeedsDisplay()
-
+            
         default: break
         }
     }
@@ -150,8 +160,8 @@ class ViewController: UIViewController {
         if let pieceView = gestureRecognizer.view {
             if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
                 pieceView.transform =
-                    pieceView.transform.scaledBy(x: gestureRecognizer.scale,
-                                                 y: gestureRecognizer.scale)
+                pieceView.transform.scaledBy(x: gestureRecognizer.scale,
+                                             y: gestureRecognizer.scale)
                 gestureRecognizer.scale = 1
             }
         }
@@ -160,7 +170,7 @@ class ViewController: UIViewController {
     @objc
     func hoverShape(_ gestureRecognizer: UIHoverGestureRecognizer) {
         guard let shapeViewToUse = gestureRecognizer.view as? ShapeView else { return }
-
+        
         switch gestureRecognizer.state {
         case .began, .changed:
             // User hovered within the view's path, change the view's border color.
@@ -171,11 +181,11 @@ class ViewController: UIViewController {
             }
             shapeViewToUse.viewPathColor = pathViewColor
             shapeViewToUse.setNeedsDisplay()
-
+            
         case .ended, .cancelled:
             // User left the view, restore the border color.
             shapeViewToUse.restoreOuterFrameColor()
-
+            
         default:
             break
         }
@@ -186,10 +196,10 @@ class ViewController: UIViewController {
 // MARK: - UIGestureRecognizerDelegate
 
 extension ViewController: UIGestureRecognizerDelegate {
-
+    
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let result = true
-
+        
         if gestureRecognizer is UIPanGestureRecognizer {
             if let shapeViewToUse = gestureRecognizer.view as? ShapeView {
                 // Bring the shape to front early, before the context menu might try to add a preview view.
@@ -212,12 +222,12 @@ extension ViewController: UIGestureRecognizerDelegate {
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         // The default behavior that you'd get if this method weren't implemented.
         var result = false
-
+        
         // Allow the pan gesture to recognize alongside gestures for the context menu.
         if gestureRecognizer is UIPanGestureRecognizer {
             result = true
         }
-
+        
         return result
     }
 }
