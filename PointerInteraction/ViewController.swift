@@ -89,7 +89,10 @@ class ViewController: UIViewController {
         shapeView.addInteraction(contextMenuInteraction)
         
         if #available(iOS 17.0, *) {
-            shapeView.hoverStyle = .init(shape: .capsule)
+            //shapeView.hoverStyle = .init(shape: .rect)
+            //shapeView.hoverStyle = .init(shape: .capsule)
+            //shapeView.hoverStyle = .init(effect: .lift, shape: .circle)
+            shapeView.hoverStyle = .init(effect: .highlight, shape: .circle)
         }
     }
     
