@@ -24,7 +24,8 @@ class ViewController: UIViewController {
         // Set the alpha control's color, and add a pointer interaction.
         alphaControl.currentColor = UIColor.systemOrange
         if #available(iOS 17.0, *) {
-            alphaControl.hoverStyle = .init(shape: .capsule)
+            //alphaControl.hoverStyle = .init(shape: .capsule)
+            alphaControl.hoverStyle = .init(effect: .highlight, shape: .circle)
         }
         alphaControl.addInteraction(UIPointerInteraction(delegate: self))
         
@@ -45,7 +46,8 @@ class ViewController: UIViewController {
                  */
                 button.pointerStyleProvider = buttonProvider
                 if #available(iOS 17.0, *) {
-                    button.hoverStyle = .init(shape: .capsule)
+                    //button.hoverStyle = .init(shape: .capsule)
+                    button.hoverStyle = .init(effect: .highlight, shape: .circle)
                 }
             }
         }
